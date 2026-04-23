@@ -181,7 +181,3 @@ Multiple skill folders can be uploaded at once — the agent discovers all `SKIL
 | `Pillow` | >= 12.2.0 | Image handling (used by some skills) |
 
 ---
-
-## License
-
-MIT
