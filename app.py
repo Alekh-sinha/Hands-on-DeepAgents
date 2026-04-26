@@ -9,7 +9,7 @@ import streamlit as st
 from langchain.chat_models import init_chat_model
 from langgraph.checkpoint.memory import MemorySaver
 
-from session_backend import SessionLocalShellBackend
+from session_backend import SessionLocalShellBackend, RecursiveSkillsMiddleware, make_session_dir
 
 # ---------------------------------------------------------------------------
 # Provider / model catalogue
@@ -163,25 +163,30 @@ with st.sidebar:
             st.error(f"Could not initialise model: {exc}")
             st.stop()
 
-        # Save uploaded files into a temp dir
-        source_dirs: list[Path] = []
+        # Save uploaded files into a session directory, then point the backend
+        # at that directory via root_dir (new interface — no more source_dirs).
         if uploaded_files:
             tmp = Path(tempfile.mkdtemp())
             for uf in uploaded_files:
-                rel = Path(uf.name)
-                dest = tmp / rel
+                dest = tmp / Path(uf.name)
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 dest.write_bytes(uf.read())
-            source_dirs.append(tmp)
+            root_dir = make_session_dir(
+                source_dirs=[tmp],
+                session_id=st.session_state.session_id,
+            )
+        else:
+            # No upload: create an empty session dir as workspace
+            root_dir = make_session_dir(
+                source_dirs=[],
+                session_id=st.session_state.session_id,
+            )
 
-        # Session-scoped sandboxed backend (shell + file ops)
-        backend = SessionLocalShellBackend(
-            source_dirs=source_dirs if source_dirs else None,
-            session_id=st.session_state.session_id,
-        )
+        backend = SessionLocalShellBackend(root_dir=root_dir)
         st.session_state.session_backend = backend
 
-        # Build the agent — pass pre-built model instance
+        # Build the agent — use RecursiveSkillsMiddleware so skills at any
+        # nesting depth inside the uploaded folder are all discovered.
         try:
             from deepagents import create_deep_agent  # noqa: PLC0415
 
@@ -189,21 +194,24 @@ with st.sidebar:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 agent = create_deep_agent(
-                    model=llm,              # pre-built instance, key already embedded
+                    model=llm,
                     backend=backend,
-                    skills=["/"],           # virtual root — scans subdirs for SKILL.md
+                    skills=None,            # disable built-in one-level discovery
+                    middleware=[
+                        RecursiveSkillsMiddleware(backend=backend, sources=["/"]),
+                    ],
                     checkpointer=checkpointer,
                 )
             st.session_state.agent = agent
             st.session_state.messages = []
             st.success(f"Agent ready — {provider_cfg['label']} / {model_label}")
-            st.caption(f"Sandbox: `{backend.session_dir}`")
+            st.caption(f"Sandbox: `{root_dir}`")
         except Exception as exc:  # noqa: BLE001
             st.error(f"Failed to create agent: {exc}")
 
     # Show sandbox contents
     if st.session_state.session_backend:
-        sd = st.session_state.session_backend.session_dir
+        sd = st.session_state.session_backend.cwd
         files = sorted(f for f in sd.rglob("*") if f.is_file())
         if files:
             with st.expander(f"Sandbox files ({len(files)})"):
