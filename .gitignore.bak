@@ -76,5 +76,3 @@ desktop.ini
 # Claude Code local settings (contain project-specific tool permissions)
 # =============================================================================
 .claude/
-
-pptx/
