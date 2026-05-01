@@ -103,7 +103,7 @@ If `SKILLS_TEMPLATE_DIR` is not set the session directory starts empty (you can 
 
 ```bash
 # Development (auto-reloads only when api/ code changes)
-uv run uvicorn api.main:app --reload --reload-dir api --host 0.0.0.0 --port 8000
+uv run uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 # Production / normal use (no reload)
 uv run uvicorn api.main:app --host 0.0.0.0 --port 8000
