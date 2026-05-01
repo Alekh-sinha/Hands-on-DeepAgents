@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skills Agent</title>
+  <link rel="stylesheet" href="/static/main.css" />
+</head>
+<body>
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-left">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"/>
+          <polyline points="8 6 2 12 8 18"/>
+        </svg>
+      </div>
+      <span class="brand-name">Skills Agent</span>
+
+      <nav class="tabs">
+        <button class="tab active" data-tab="chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          Chat
+        </button>
+        <button class="tab" data-tab="training">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          AI Training
+        </button>
+      </nav>
+    </div>
+
+    <div class="header-right">
+      <span class="user-email" id="user-email"></span>
+      <button class="btn-ghost btn-sm" id="logout-btn">Sign out</button>
+    </div>
+  </header>
+
+  <!-- ── Chat tab ─────────────────────────────────────────────────────────── -->
+  <div id="tab-chat" class="tab-content active">
+    <div class="workspace">
+
+      <!-- Left: Skills panel -->
+      <aside class="panel panel-left">
+        <div class="panel-header">
+          <span class="panel-title">Skills</span>
+          <label class="btn-ghost btn-icon" title="Upload skills (ZIP)" id="upload-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+            </svg>
+            <input type="file" id="skill-upload" accept=".zip" style="display:none" />
+          </label>
+        </div>
+        <div class="panel-body" id="skills-list">
+          <div class="empty-state" id="skills-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+            <p>No skills found</p>
+            <span>Upload a ZIP or set SKILLS_TEMPLATE_DIR</span>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <div class="upload-status" id="upload-status"></div>
+        </div>
+      </aside>
+
+      <!-- Center: Chat -->
+      <main class="chat-area">
+        <div class="messages" id="messages">
+          <div class="welcome">
+            <div class="welcome-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <h2>How can I help?</h2>
+            <p>Register a model on the right, then start chatting.<br />
+               Your agent has access to all skills in the left panel.</p>
+          </div>
+        </div>
+        <div class="chat-input-bar">
+          <div class="input-row">
+            <textarea
+              id="chat-input"
+              class="chat-textarea"
+              placeholder="Message the agent… (Enter to send, Shift+Enter for newline)"
+              rows="1"
+            ></textarea>
+            <button class="send-btn" id="send-btn" disabled>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right: Model registry -->
+      <aside class="panel panel-right">
+        <div class="panel-header">
+          <span class="panel-title">Models</span>
+          <button class="btn-ghost btn-icon" id="add-model-btn" title="Register a model">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="panel-body" id="models-list">
+          <div class="empty-state" id="models-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>
+            </svg>
+            <p>No models registered</p>
+            <span>Click + to add a model</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ── AI Training tab ──────────────────────────────────────────────────── -->
+  <div id="tab-training" class="tab-content">
+    <div class="training-page">
+      <div class="training-hero">
+        <h1>AI Training</h1>
+        <p>Fine-tune and manage models for your specific skill domains.</p>
+      </div>
+
+      <div class="training-grid">
+        <div class="training-card coming-soon">
+          <div class="tc-icon tc-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+          </div>
+          <h3>Model Fine-tuning</h3>
+          <p>Adapt foundation models to your skill-specific data with LoRA or full fine-tuning pipelines.</p>
+          <span class="badge badge-soon">Coming soon</span>
+        </div>
+
+        <div class="training-card coming-soon">
+          <div class="tc-icon tc-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+            </svg>
+          </div>
+          <h3>Dataset Management</h3>
+          <p>Upload, version, and curate training datasets. Tag examples by skill category and quality.</p>
+          <span class="badge badge-soon">Coming soon</span>
+        </div>
+
+        <div class="training-card coming-soon">
+          <div class="tc-icon tc-orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <h3>Training Jobs</h3>
+          <p>Launch and monitor distributed training runs. Track loss curves, eval metrics, and checkpoints.</p>
+          <span class="badge badge-soon">Coming soon</span>
+        </div>
+
+        <div class="training-card coming-soon">
+          <div class="tc-icon tc-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <h3>Evaluation Reports</h3>
+          <p>Automated benchmarks and human eval pipelines to measure skill execution quality.</p>
+          <span class="badge badge-soon">Coming soon</span>
+        </div>
+
+        <div class="training-card coming-soon">
+          <div class="tc-icon tc-red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <h3>RLHF Pipeline</h3>
+          <p>Collect human preference data and apply reinforcement learning from human feedback.</p>
+          <span class="badge badge-soon">Coming soon</span>
+        </div>
+
+        <div class="training-card coming-soon">
+          <div class="tc-icon tc-teal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
+            </svg>
+          </div>
+          <h3>Prompt Engineering</h3>
+          <p>Systematic prompt optimization with A/B testing across models and skill categories.</p>
+          <span class="badge badge-soon">Coming soon</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Register Model Modal ─────────────────────────────────────────────── -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Register Model</h2>
+        <button class="btn-ghost btn-icon" id="modal-close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="model-form" novalidate>
+          <div class="field">
+            <label>Provider</label>
+            <select id="m-provider" class="select">
+              <option value="google_genai">Google Gemini</option>
+              <option value="anthropic">Anthropic Claude</option>
+              <option value="openai">OpenAI</option>
+              <option value="azure_openai">Azure OpenAI</option>
+              <option value="groq">Groq</option>
+              <option value="mistralai">Mistral AI</option>
+              <option value="ollama">Ollama (local)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Display name</label>
+            <input type="text" id="m-name" class="input" placeholder="e.g. Gemini Flash" />
+          </div>
+          <div class="field">
+            <label>Model ID</label>
+            <input type="text" id="m-model" class="input" placeholder="e.g. gemini-2.5-flash" />
+          </div>
+          <div class="field" id="field-apikey">
+            <label>API Key</label>
+            <input type="password" id="m-apikey" class="input" placeholder="sk-…" autocomplete="off" />
+          </div>
+          <!-- Azure-specific fields -->
+          <div id="azure-fields" style="display:none">
+            <div class="field">
+              <label>Azure Endpoint</label>
+              <input type="text" id="m-azure-endpoint" class="input"
+                placeholder="https://RESOURCE.openai.azure.com/" />
+            </div>
+            <div class="field">
+              <label>API Version</label>
+              <input type="text" id="m-azure-version" class="input"
+                placeholder="2025-01-01-preview" value="2025-01-01-preview" />
+            </div>
+          </div>
+          <!-- Ollama-specific fields -->
+          <div id="ollama-fields" style="display:none">
+            <div class="field">
+              <label>Base URL</label>
+              <input type="text" id="m-base-url" class="input"
+                placeholder="http://localhost:11434" value="http://localhost:11434" />
+            </div>
+          </div>
+
+          <p class="form-error" id="model-form-error"></p>
+          <div class="modal-footer">
+            <button type="button" class="btn-ghost" id="modal-cancel">Cancel</button>
+            <button type="submit" class="btn-primary" id="model-submit">Register</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
