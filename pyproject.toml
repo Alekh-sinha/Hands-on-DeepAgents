@@ -12,4 +12,7 @@ dependencies = [
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.30.0",
     "python-multipart>=0.0.9",
+    "langchain-ollama>=1.1.0",
+    "langfuse>=4.6.1",
+    "python-dotenv>=1.2.2",
 ]
