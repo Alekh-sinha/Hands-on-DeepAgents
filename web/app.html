@@ -44,25 +44,48 @@
   <div id="tab-chat" class="tab-content active">
     <div class="workspace">
 
-      <!-- Left: Skills panel -->
+      <!-- Left: Session File Explorer -->
       <aside class="panel panel-left">
         <div class="panel-header">
-          <span class="panel-title">Skills</span>
-          <label class="btn-ghost btn-icon" title="Upload skills (ZIP)" id="upload-label">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
-              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
-            </svg>
-            <input type="file" id="skill-upload" accept=".zip" style="display:none" />
-          </label>
+          <span class="panel-title">Explorer</span>
+          <div class="panel-actions">
+            <label class="btn-icon" title="Upload file (ZIP auto-extracted)" id="upload-label" style="cursor:pointer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+              </svg>
+              <input type="file" id="file-upload" style="display:none" />
+            </label>
+            <label class="btn-icon" title="Upload folder" style="cursor:pointer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                <polyline points="12 11 12 17"/><polyline points="9 14 12 11 15 14"/>
+              </svg>
+              <input type="file" id="folder-upload" style="display:none" webkitdirectory multiple />
+            </label>
+            <button class="btn-icon" id="new-folder-btn" title="New folder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                <line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/>
+              </svg>
+            </button>
+            <button class="btn-icon" id="download-session-btn" title="Download session as ZIP">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </button>
+          </div>
         </div>
-        <div class="panel-body" id="skills-list">
-          <div class="empty-state" id="skills-empty">
+        <div class="panel-body" id="fe-tree-container">
+          <div id="fe-tree"></div>
+          <div class="empty-state" id="fe-empty" style="display:none">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
             </svg>
-            <p>No skills found</p>
-            <span>Upload a ZIP or set SKILLS_TEMPLATE_DIR</span>
+            <p>Session folder is empty</p>
+            <span>Upload files or start chatting</span>
           </div>
         </div>
         <div class="panel-footer">
@@ -81,7 +104,7 @@
             </div>
             <h2>How can I help?</h2>
             <p>Register a model on the right, then start chatting.<br />
-               Your agent has access to all skills in the left panel.</p>
+               Browse and edit your session files in the left panel.</p>
           </div>
         </div>
         <div class="chat-input-bar">
@@ -105,7 +128,7 @@
       <aside class="panel panel-right">
         <div class="panel-header">
           <span class="panel-title">Models</span>
-          <button class="btn-ghost btn-icon" id="add-model-btn" title="Register a model">
+          <button class="btn-icon" id="add-model-btn" title="Register a model">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
@@ -211,7 +234,7 @@
     <div class="modal">
       <div class="modal-header">
         <h2>Register Model</h2>
-        <button class="btn-ghost btn-icon" id="modal-close">
+        <button class="btn-icon" id="modal-close">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
@@ -243,7 +266,6 @@
             <label>API Key</label>
             <input type="password" id="m-apikey" class="input" placeholder="sk-…" autocomplete="off" />
           </div>
-          <!-- Azure-specific fields -->
           <div id="azure-fields" style="display:none">
             <div class="field">
               <label>Azure Endpoint</label>
@@ -256,7 +278,6 @@
                 placeholder="2025-01-01-preview" value="2025-01-01-preview" />
             </div>
           </div>
-          <!-- Ollama-specific fields -->
           <div id="ollama-fields" style="display:none">
             <div class="field">
               <label>Base URL</label>
@@ -271,6 +292,96 @@
             <button type="submit" class="btn-primary" id="model-submit">Register</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── File Editor Modal ────────────────────────────────────────────────── -->
+  <div class="modal-backdrop" id="editor-backdrop">
+    <div class="modal editor-modal">
+      <div class="editor-header">
+        <div class="editor-breadcrumb" id="editor-breadcrumb"></div>
+        <div class="editor-header-actions">
+          <div class="versions-dropdown" id="versions-dropdown">
+            <button class="btn-ghost btn-sm" id="versions-btn" disabled>History</button>
+            <div class="versions-menu" id="versions-menu" hidden>
+              <div class="versions-menu-header">Version History</div>
+            </div>
+          </div>
+          <button class="btn-primary btn-sm" id="editor-save-btn">Save</button>
+          <button class="btn-icon btn-danger" id="editor-delete-btn" title="Delete file">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14H6L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
+              <path d="M9 6V4h6v2"/>
+            </svg>
+          </button>
+          <button class="btn-icon" id="editor-close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="editor-body">
+        <textarea id="editor-textarea" class="code-editor" spellcheck="false"
+          placeholder="File content will appear here…"></textarea>
+      </div>
+      <div class="editor-statusbar">
+        <span class="editor-status-msg dim" id="editor-status-msg"></span>
+        <span class="editor-hint">Ctrl+S to save · Tab for indent</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Upload Dialog ────────────────────────────────────────────────────── -->
+  <div class="modal-backdrop" id="upload-backdrop">
+    <div class="modal upload-modal">
+      <div class="modal-header">
+        <h2>Upload File</h2>
+        <button class="btn-icon" id="upload-modal-close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.875rem; color:var(--text-2); margin-bottom:16px">
+          Uploading: <strong id="upload-filename" style="color:var(--text)"></strong>
+        </p>
+        <div class="field">
+          <label>Destination folder <span style="color:var(--muted)">(leave empty for session root)</span></label>
+          <input type="text" id="upload-dest" class="input" placeholder="e.g. skills/my-skill" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="upload-modal-cancel">Cancel</button>
+          <button type="button" class="btn-primary" id="upload-modal-confirm">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── New Folder Dialog ────────────────────────────────────────────────── -->
+  <div class="modal-backdrop" id="newfolder-backdrop">
+    <div class="modal newfolder-modal">
+      <div class="modal-header">
+        <h2>New Folder</h2>
+        <button class="btn-icon" id="newfolder-close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>Folder path <span style="color:var(--muted)">(relative to session root)</span></label>
+          <input type="text" id="newfolder-path" class="input" placeholder="e.g. my-docs/notes" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="newfolder-cancel">Cancel</button>
+          <button type="button" class="btn-primary" id="newfolder-confirm">Create</button>
+        </div>
       </div>
     </div>
   </div>

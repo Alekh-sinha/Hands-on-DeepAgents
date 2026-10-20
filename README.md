@@ -193,15 +193,7 @@ uv run streamlit run app.py
 
 ---
 
-## Security notes
 
-<<<<<<< HEAD
-- **API keys** are injected directly into the `BaseChatModel` constructor and held only in Streamlit session state for the duration of the browser session. They are never written to disk.
-- **File sandbox** — `virtual_mode=True` on the backend blocks path traversal (`..`, `~`, absolute paths outside the session directory) at the file-tools level. The agent cannot read files outside `sessions/<id>/`.
-- **Shell execution** is not sandboxed at the OS level — commands run on the host with the current user's permissions. Only deploy this in trusted environments or with Human-in-the-Loop interrupts enabled.
-- Do **not** commit `.env` files — the `.gitignore` excludes them.
-
----
 
 ## Dependencies
 
@@ -216,8 +208,11 @@ uv run streamlit run app.py
 | `Pillow` | >= 12.2.0 | Image handling (used by some skills) |
 
 ---
-=======
-- Session directories are sandboxed via `virtual_mode=True` — agents cannot read or write outside their assigned folder.
-- API keys are stored only in server memory for the lifetime of the session and never written to disk.
+
+## Security notes
+
+- **API keys** are injected directly into the `BaseChatModel` constructor and held only in server/session memory for the duration of the session. They are never written to disk.
+- **File sandbox** — `virtual_mode=True` on the backend blocks path traversal (`..`, `~`, absolute paths outside the session directory) at the file-tools level. The agent cannot read or write outside `sessions/<id>/`.
+- **Shell execution** is not sandboxed at the OS level — commands run on the host with the current user's permissions. Only deploy this in trusted environments or with Human-in-the-Loop interrupts enabled.
 - Add proper authentication before exposing this to the public internet.
->>>>>>> deepagents-experiment
+- Do **not** commit `.env` files — the `.gitignore` excludes them.
